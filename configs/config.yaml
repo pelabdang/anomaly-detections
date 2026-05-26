@@ -1,0 +1,58 @@
+# Sensor Anomaly Detection - Configuration
+# ==========================================
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  dataset: "nasa_bearing"  # nasa_bearing or mimii
+  # NASA Bearing dataset settings
+  nasa_bearing:
+    url: "https://data.nasa.gov/download/brfb-gzcv/application%2Fx-zip-compressed"
+    test_set: "2nd_test"  # 1st_test, 2nd_test, or 3rd_test
+    sample_rate: 20480  # Hz
+    channels: ["ch1", "ch2", "ch3", "ch4"]
+
+features:
+  window_size: 2048
+  overlap: 0.5
+  # Statistical features extracted from each window
+  statistical:
+    - rms
+    - kurtosis
+    - skewness
+    - peak_to_peak
+    - crest_factor
+  # Frequency domain features
+  frequency:
+    - spectral_centroid
+    - spectral_bandwidth
+    - dominant_frequency
+
+model:
+  # Isolation Forest parameters
+  isolation_forest:
+    n_estimators: 200
+    contamination: 0.05
+    max_samples: "auto"
+    random_state: 42
+
+  # LSTM Autoencoder parameters
+  lstm_autoencoder:
+    sequence_length: 30
+    hidden_size: 64
+    num_layers: 2
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 50
+    patience: 10  # early stopping patience
+    threshold_percentile: 95  # anomaly threshold
+
+mlflow:
+  tracking_uri: "mlruns"
+  experiment_name: "sensor-anomaly-detection"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  model_path: "models/best_model"
